@@ -116,12 +116,12 @@ See [`LIMITATIONS.md`](LIMITATIONS.md) for transparent hardware boundaries and f
 
 ## 📂 Architecture & Package Namespace Status
 
-The codebase is currently organized as a single application module (`:app`) under the package namespace `com.example.*`. A modular architecture and namespace migration are planned for upcoming milestones:
+The codebase is currently organized as a single application module (`:app`) under the package namespace `com.ashishsinghbora.flashcore`. A modular architecture is planned for upcoming milestones:
 
 ```text
 flashcore/
 ├── app/                        # Current single module (UI, ViewModels, Compose, Drivers, Flashing engines)
-│   └── src/main/java/com/example/
+│   └── src/main/java/com/ashishsinghbora/flashcore/
 │       ├── block/              # BlockDevice abstraction and test doubles
 │       ├── dsa/                # DirectRingBuffer, WimChunker, IsoTrieParser
 │       ├── fat32/              # FAT32 formatting and file writing
@@ -134,7 +134,7 @@ flashcore/
 │       └── usb/                # Android USB Host Mass Storage driver
 ```
 
-> **Namespace Migration Status:** Source code currently resides in `com.example.*`. Migration to `com.ashishsinghbora.flashcore` alongside multi-module extraction (`:core`, `:flashers`, `:app`) is planned in future architectural refactoring.
+> **Namespace Migration Status:** Migrated to `com.ashishsinghbora.flashcore`. Multi-module extraction (`:core`, `:flashers`, `:app`) is planned in future architectural refactoring.
 
 ---
 
