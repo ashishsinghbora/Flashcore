@@ -207,21 +207,21 @@ class FlasherViewModel(
                 }
             }
 
-            val currentSelected = _uiState.value.selectedDevice
-            val selected = when {
-                autoSelectDevice != null -> diskList.find { it.device == autoSelectDevice } ?: diskList.firstOrNull()
-                currentSelected != null -> diskList.find { it.serialNumber == currentSelected.serialNumber } ?: if (currentSelected.device == null) currentSelected else diskList.firstOrNull()
-                else -> diskList.firstOrNull()
-            }
+            _uiState.update { current ->
+                val currentSelected = current.selectedDevice
+                val selected = when {
+                    autoSelectDevice != null -> diskList.find { it.device == autoSelectDevice } ?: diskList.firstOrNull()
+                    currentSelected != null -> diskList.find { it.serialNumber == currentSelected.serialNumber } ?: if (currentSelected.device == null) currentSelected else diskList.firstOrNull()
+                    else -> diskList.firstOrNull()
+                }
 
-            if (diskList.isNotEmpty() && selected != null) {
-                fsm.transition(FlasherEvent.DevicesUpdated(diskList, selected))
-            } else {
-                fsm.transition(FlasherEvent.ResetToIdle)
-            }
+                if (diskList.isNotEmpty() && selected != null) {
+                    fsm.transition(FlasherEvent.DevicesUpdated(diskList, selected))
+                } else if (selected == null && currentSelected == null) {
+                    fsm.transition(FlasherEvent.ResetToIdle)
+                }
 
-            _uiState.update {
-                it.copy(
+                current.copy(
                     connectedDevices = diskList,
                     selectedDevice = selected,
                     fsmState = fsm.state.value
@@ -617,7 +617,7 @@ class FlasherViewModel(
         FlashForegroundService.complete("Flash Cancelled", "Operation cancelled by user", false)
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         super.onCleared()
         try {
             getApplication<Application>().unregisterReceiver(usbReceiver)
