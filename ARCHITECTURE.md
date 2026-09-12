@@ -90,7 +90,7 @@ To maintain engineering transparency, the architectural reality of the repositor
 | :--- | :--- | :--- |
 | **Gradle Modules** | Single monolithic `:app` module containing all layers | Multi-module separation (`:core`, `:flashers`, `:app`) |
 | **Package Namespace** | `com.ashishsinghbora.flashcore.*` across all source packages | Multi-module package organization |
-| **Testing Scope** | 109 automated software tests on `BlockDevice` doubles | Automated CI + physical USB controller test matrix |
+| **Testing Scope** | 225 automated software tests on `BlockDevice` doubles | Automated CI + physical USB controller test matrix |
 | **USB Memory Pipeline** | Direct-buffer circular ring buffer with heap staging copy | Direct ring buffer (true zero-copy is not possible via public Android APIs; requires staging copy) |
 | **Hardware Status** | Software tested; hardware validation pending | Physical qualification across OEM and controller matrix |
 

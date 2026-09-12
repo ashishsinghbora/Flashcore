@@ -7,7 +7,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-green.svg)](https://developer.android.com)
 [![JDK](https://img.shields.io/badge/JDK-21-red.svg)](https://adoptium.net)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2+-purple.svg)](https://kotlinlang.org)
-[![Tests](https://img.shields.io/badge/Tests-110%20Automated%20Test%20Methods-blue.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-226%20Automated%20Test%20Methods-blue.svg)]()
 [![Hardware Validation](https://img.shields.io/badge/Hardware%20Validation-Pending-yellow.svg)](LIMITATIONS.md)
 [![Documentation](https://img.shields.io/badge/Docs-Architecture%20%7C%20Limitations-orange.svg)](ARCHITECTURE.md)
 
@@ -27,7 +27,7 @@ Our guiding principle is **engineering truthfulness**:
 ### Engineering Priorities & Baseline Reality
 1. 🥇 **Correctness:** Bit-for-bit exactness in sector writing and verification logic.
 2. 🥈 **Safety:** Hardened disconnect handling (`ACTION_USB_DEVICE_DETACHED`) and target drive safety checks.
-3. 🥉 **Testability:** Core logic is decoupled from Android hardware APIs and covered by 187 automated tests (186 unit/Robolectric in JVM + 1 Android instrumentation test) on abstract `BlockDevice` doubles.
+3. 🥉 **Testability:** Core logic is decoupled from Android hardware APIs and covered by 226 automated tests (225 unit/Robolectric in JVM + 1 Android instrumentation test) on abstract `BlockDevice` doubles.
 4. **USB Reliability:** SCSI BOT stall recovery routines, clear-halt, and reset recovery (physical controller compatibility matrix pending).
 5. **Block-Device Abstraction:** Zero coupling between UI/engines and Android hardware APIs.
 6. **Partition Correctness:** Strict GPT/MBR alignment, CRC32 checks, and protective structures.
@@ -99,7 +99,7 @@ For complete technical specifications, review [`ARCHITECTURE.md`](ARCHITECTURE.m
 | **Block Device Test Framework** | Implemented | 37 unit tests in `BlockDeviceFrameworkTest` | N/A (Software Test Double) | 🟢 **Implemented — software tested** | In-memory sparse, file-backed, and fault-injecting simulation; does not emulate physical controller hangs, power drops, or bus resets | [`BlockDevice.kt`](app/src/main/java/com/example/block/BlockDevice.kt), [`BlockDeviceFrameworkTest.kt`](app/src/test/java/com/example/BlockDeviceFrameworkTest.kt) |
 | **FAT32 Filesystem Writer** | Implemented | 9 unit tests in `Fat32WriterTest` | Not validated | 🟢 **Implemented — software tested** | Custom minimal FAT32 engine; lacks fsck/repair; cluster allocation not validated against physical OS mount drivers | [`Fat32Writer.kt`](app/src/main/java/com/example/fat32/Fat32Writer.kt), [`Fat32WriterTest.kt`](app/src/test/java/com/example/Fat32WriterTest.kt) |
 | **ISO Filesystem Engine** | Implemented | 6 unit tests in `IsoEngineTest` & `IsoFilesystemReaderTest` | N/A (Software Parser) | 🟢 **Implemented — software tested** | Supports ISO 9660 Level 1/2/3 and Joliet; no Rock Ridge POSIX permissions or pure UDF 2.60 support | [`IsoFilesystemReader.kt`](app/src/main/java/com/example/iso/IsoFilesystemReader.kt), [`IsoEngineTest.kt`](app/src/test/java/com/example/IsoEngineTest.kt) |
-| **Partition Subsystem** | Implemented | 9 unit tests in `PartitionEngineTest` | Not validated | 🟢 **Implemented — software tested** | MBR and GPT layout generation verified in memory; partition table detection not validated on physical drives | [`PartitionEngine.kt`](app/src/main/java/com/example/partition/PartitionEngine.kt), [`PartitionEngineTest.kt`](app/src/test/java/com/example/PartitionEngineTest.kt) |
+| **Partition Subsystem** | Implemented | 10 unit tests in `PartitionEngineTest` | Not validated | 🟢 **Implemented — software tested** | MBR and GPT layout generation verified in memory; partition table detection not validated on physical drives | [`PartitionEngine.kt`](app/src/main/java/com/example/partition/PartitionEngine.kt), [`PartitionEngineTest.kt`](app/src/test/java/com/example/PartitionEngineTest.kt) |
 | **Android Production Engineering** | Implemented | 10 Robolectric tests in `AndroidProductionEngineeringTest` | Not validated | 🟡 **Implemented — hardware validation pending** | Foreground service and wake lock tested via Robolectric; synthetic benchmark/scalability harness; physical flash-drive performance and thermal telemetry not validated | [`FlashForegroundService.kt`](app/src/main/java/com/example/service/FlashForegroundService.kt), [`AndroidProductionEngineeringTest.kt`](app/src/test/java/com/example/AndroidProductionEngineeringTest.kt) |
 | **SPSC Direct Ring Buffer** | Implemented | 2 unit tests in `FlashCoreUnitTest` | Not validated | 🟢 **Implemented — software tested** | Off-heap direct buffers reduce GC churn, but USB transfer path still includes a heap staging copy (not zero-copy); uses ReentrantLock | [`DirectRingBuffer.kt`](app/src/main/java/com/example/dsa/DirectRingBuffer.kt), [`FlashCoreUnitTest.kt`](app/src/test/java/com/example/FlashCoreUnitTest.kt) |
 | **CI & Release Infrastructure** | Workflows configured | Configured in `.github/workflows` | Not validated | 🟡 **Configured — no published releases** | GitHub Actions workflows configured for lint, test, and signing; no official release tags or published APKs exist yet | [`.github/workflows/ci.yml`](.github/workflows/ci.yml), [`.github/workflows/release.yml`](.github/workflows/release.yml) |
@@ -161,7 +161,7 @@ When building in an environment configured with JDK 21 and Android SDK:
 # 1. Run Android Lint
 ./gradlew lint
 
-# 2. Run automated test suite (186 JVM/Robolectric unit tests)
+# 2. Run automated test suite (225 JVM/Robolectric unit tests)
 ./gradlew test
 
 # 3. Assemble Debug APK
@@ -172,8 +172,8 @@ When building in an environment configured with JDK 21 and Android SDK:
 ```
 
 ### Automated Test Suite Details
-The repository contains **187 automated test methods** across 18 test files:
-- **186 Unit & Robolectric tests** in `app/src/test` (across 17 test files): Covering block device doubles, USB bulk transfer length validation, SCSI BOT driver protocol, SCSI CDB construction, SCSI CHECK CONDITION and REQUEST SENSE sense data parsing, FAT32 formatting/allocation, ISO 9660 parsing, GPT/MBR partition engines, Linux/Windows/Ventoy strategies, and foreground service lifecycle.
+The repository contains **226 automated test methods** across 19 test files:
+- **225 Unit & Robolectric tests** in `app/src/test` (across 18 test files): Covering block device doubles, in-memory block devices (`MemoryBlockDevice`), USB bulk transfer length validation, SCSI BOT driver protocol, SCSI CDB construction, SCSI CHECK CONDITION and REQUEST SENSE sense data parsing, FAT32 formatting/allocation, ISO 9660 parsing, GPT/MBR partition engines, Linux/Windows/Ventoy strategies, and foreground service lifecycle.
 - **1 Instrumentation test** in `app/src/androidTest`: Context verification (`ExampleInstrumentedTest.kt`).
 - **Physical Hardware Tests:** 0. (All tests run against mock/in-memory abstractions; physical USB hardware and PC boot testing are not automated in CI).
 

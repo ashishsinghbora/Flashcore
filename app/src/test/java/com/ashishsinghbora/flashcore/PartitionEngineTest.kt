@@ -111,6 +111,64 @@ class PartitionEngineTest {
     }
 
     @Test
+    fun testMbrDeviceWriteAndRoundTripParsing() {
+        runBlocking {
+            val totalSectors = 2097152L // 1 GB
+            val memDevice = MemoryBlockDevice(totalSectors = totalSectors, sectorSizeBytes = 512)
+
+            val p1 = Partition(
+                index = 1,
+                firstLba = 2048L,
+                lastLba = 100000L,
+                name = "System",
+                mbrType = MbrBuilder.TYPE_FAT32_LBA,
+                bootable = true
+            )
+            val p2 = Partition(
+                index = 2,
+                firstLba = 102400L,
+                lastLba = 500000L,
+                name = "Data",
+                mbrType = MbrBuilder.TYPE_NTFS_EXFAT,
+                bootable = false
+            )
+
+            val table = MbrPartitionTable(
+                partitions = listOf(p1, p2),
+                totalDiskSectors = totalSectors,
+                diskSignature = 0x55AA1234
+            )
+
+            // Write MBR bytes to Sector 0 of MemoryBlockDevice
+            val mbrBytes = PartitionEngine.buildMbrBytes(table)
+            assertTrue(memDevice.write(lba = 0L, blockCount = 1, src = mbrBytes))
+            assertTrue(memDevice.flush())
+
+            // Read partition table back from the BlockDevice
+            val parsedTable = PartitionEngine.readFromDevice(memDevice)
+            assertNotNull(parsedTable)
+            assertTrue(parsedTable is MbrPartitionTable)
+
+            val mbr = parsedTable as MbrPartitionTable
+            assertEquals(0x55AA1234, mbr.diskSignature)
+            assertEquals(2, mbr.partitions.size)
+            assertFalse(mbr.isProtective)
+
+            assertEquals(1, mbr.partitions[0].index)
+            assertEquals(2048L, mbr.partitions[0].firstLba)
+            assertEquals(100000L, mbr.partitions[0].lastLba)
+            assertEquals(MbrBuilder.TYPE_FAT32_LBA, mbr.partitions[0].mbrType)
+            assertTrue(mbr.partitions[0].bootable)
+
+            assertEquals(2, mbr.partitions[1].index)
+            assertEquals(102400L, mbr.partitions[1].firstLba)
+            assertEquals(500000L, mbr.partitions[1].lastLba)
+            assertEquals(MbrBuilder.TYPE_NTFS_EXFAT, mbr.partitions[1].mbrType)
+            assertFalse(mbr.partitions[1].bootable)
+        }
+    }
+
+    @Test
     fun testProtectiveMbrGenerationAndDetection() {
         val totalSectors = 62914560L // 30 GB disk
         val protectiveBytes = PartitionEngine.buildProtectiveMbr(totalSectors)
