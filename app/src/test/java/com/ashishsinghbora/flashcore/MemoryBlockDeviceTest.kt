@@ -696,7 +696,7 @@ class MemoryBlockDeviceTest {
                     } else {
                         unexpectedErrors.add(e)
                     }
-                } catch (t: Throwable) {
+                } catch (t: Exception) {
                     unexpectedErrors.add(t)
                 }
             }
