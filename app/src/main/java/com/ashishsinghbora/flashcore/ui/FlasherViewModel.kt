@@ -207,10 +207,22 @@ class FlasherViewModel(
                 }
             }
 
+            fun isSameDevice(a: UsbDiskInfo, b: UsbDiskInfo): Boolean {
+                val serialA = a.serialNumber
+                val serialB = b.serialNumber
+                return if (!serialA.isNullOrBlank() && !serialB.isNullOrBlank()) {
+                    serialA == serialB
+                } else if (a.device != null && b.device != null) {
+                    a.device.deviceId == b.device.deviceId || a.device.deviceName == b.device.deviceName
+                } else {
+                    a == b
+                }
+            }
+
             val currentSelected = _uiState.value.selectedDevice
             val selected = when {
                 autoSelectDevice != null -> diskList.find { it.device == autoSelectDevice } ?: diskList.firstOrNull()
-                currentSelected != null -> diskList.find { it.serialNumber == currentSelected.serialNumber } ?: if (currentSelected.device == null) currentSelected else diskList.firstOrNull()
+                currentSelected != null -> diskList.find { isSameDevice(it, currentSelected) } ?: if (currentSelected.device == null) currentSelected else diskList.firstOrNull()
                 else -> diskList.firstOrNull()
             }
 
@@ -221,11 +233,10 @@ class FlasherViewModel(
             }
 
             _uiState.update { current ->
+                val currentDev = current.selectedDevice
                 val activeSelected = when {
-                    current.selectedDevice != null && current.selectedDevice?.device == null -> current.selectedDevice
-                    current.selectedDevice != null && diskList.any { it.serialNumber == current.selectedDevice?.serialNumber } -> {
-                        diskList.firstOrNull { it.serialNumber == current.selectedDevice?.serialNumber } ?: current.selectedDevice
-                    }
+                    currentDev != null && currentDev.device == null -> currentDev
+                    currentDev != null -> diskList.firstOrNull { isSameDevice(it, currentDev) } ?: selected
                     else -> selected
                 }
 
