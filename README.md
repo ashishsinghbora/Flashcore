@@ -2,6 +2,7 @@
 
 > **Non-root bootable USB creator for Android via USB OTG.**
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/72588187cf474c4aa3649e1d97a348b3)](https://app.codacy.com/gh/ashishsinghbora/Flashcore?utm_source=github.com&utm_medium=referral&utm_content=ashishsinghbora/Flashcore&utm_campaign=Badge_Grade)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL_v3-blue.svg)](LICENSE)
 [![CI](https://github.com/ashishsinghbora/Flashcore/actions/workflows/ci.yml/badge.svg)](https://github.com/ashishsinghbora/Flashcore/actions/workflows/ci.yml)
 [![Platform](https://img.shields.io/badge/Platform-Android_8.0+-green.svg)](https://developer.android.com)
