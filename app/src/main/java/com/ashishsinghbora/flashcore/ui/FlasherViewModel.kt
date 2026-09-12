@@ -210,12 +210,12 @@ class FlasherViewModel(
             fun isSameDevice(a: UsbDiskInfo, b: UsbDiskInfo): Boolean {
                 val serialA = a.serialNumber
                 val serialB = b.serialNumber
-                return if (!serialA.isNullOrBlank() && !serialB.isNullOrBlank()) {
-                    serialA == serialB
-                } else if (a.device != null && b.device != null) {
-                    a.device.deviceId == b.device.deviceId || a.device.deviceName == b.device.deviceName
-                } else {
-                    a == b
+                return when {
+                    !serialA.isNullOrBlank() && !serialB.isNullOrBlank() -> serialA == serialB
+                    a.device != null && b.device != null -> {
+                        a.device.deviceId == b.device.deviceId && a.device.deviceName == b.device.deviceName
+                    }
+                    else -> a == b
                 }
             }
 
