@@ -207,23 +207,31 @@ class FlasherViewModel(
                 }
             }
 
-            _uiState.update { current ->
-                val currentSelected = current.selectedDevice
-                val selected = when {
-                    autoSelectDevice != null -> diskList.find { it.device == autoSelectDevice } ?: diskList.firstOrNull()
-                    currentSelected != null -> diskList.find { it.serialNumber == currentSelected.serialNumber } ?: if (currentSelected.device == null) currentSelected else diskList.firstOrNull()
-                    else -> diskList.firstOrNull()
-                }
+            val currentSelected = _uiState.value.selectedDevice
+            val selected = when {
+                autoSelectDevice != null -> diskList.find { it.device == autoSelectDevice } ?: diskList.firstOrNull()
+                currentSelected != null -> diskList.find { it.serialNumber == currentSelected.serialNumber } ?: if (currentSelected.device == null) currentSelected else diskList.firstOrNull()
+                else -> diskList.firstOrNull()
+            }
 
-                if (diskList.isNotEmpty() && selected != null) {
-                    fsm.transition(FlasherEvent.DevicesUpdated(diskList, selected))
-                } else if (selected == null && currentSelected == null) {
-                    fsm.transition(FlasherEvent.ResetToIdle)
+            if (diskList.isNotEmpty() && selected != null) {
+                fsm.transition(FlasherEvent.DevicesUpdated(diskList, selected))
+            } else if (currentSelected?.device != null) {
+                fsm.transition(FlasherEvent.ResetToIdle)
+            }
+
+            _uiState.update { current ->
+                val activeSelected = when {
+                    current.selectedDevice != null && current.selectedDevice?.device == null -> current.selectedDevice
+                    current.selectedDevice != null && diskList.any { it.serialNumber == current.selectedDevice?.serialNumber } -> {
+                        diskList.firstOrNull { it.serialNumber == current.selectedDevice?.serialNumber } ?: current.selectedDevice
+                    }
+                    else -> selected
                 }
 
                 current.copy(
                     connectedDevices = diskList,
-                    selectedDevice = selected,
+                    selectedDevice = activeSelected,
                     fsmState = fsm.state.value
                 )
             }
@@ -617,7 +625,7 @@ class FlasherViewModel(
         FlashForegroundService.complete("Flash Cancelled", "Operation cancelled by user", false)
     }
 
-    public override fun onCleared() {
+    override fun onCleared() {
         super.onCleared()
         try {
             getApplication<Application>().unregisterReceiver(usbReceiver)
